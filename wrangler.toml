@@ -10,3 +10,4 @@ SITES_HOST = "img.ruihan.xin"
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "davflare"
+# trigger redeploy to pick up WEBDAV_PASSWORD secret
