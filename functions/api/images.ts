@@ -127,9 +127,16 @@ export const onRequestPost: PagesFunction<ImagesEnv> = async (context) => {
   }
 
   const contentTypeHeader = request.headers.get("Content-Type") || "";
-  let filename = sanitizeName(request.headers.get("X-File-Name") || "");
+  // 前端用 encodeURIComponent 编码中文文件名，这里解码；解码失败时降级为原始值
+  const rawName = request.headers.get("X-File-Name") || "";
+  let filename = "";
+  try {
+    filename = sanitizeName(decodeURIComponent(rawName));
+  } catch {
+    filename = sanitizeName(rawName);
+  }
   let bytes: ArrayBuffer;
-  let declaredType = contentTypeHeader.split(";")[0].trim();
+  let declaredType = contentTypeHeader.split(";").trim();
 
   if (contentTypeHeader.toLowerCase().includes("multipart/form-data")) {
     const form = await request.formData();
