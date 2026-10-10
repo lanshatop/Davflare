@@ -4,7 +4,7 @@ import dictionaryEntries from "./stringsDictionary";
 
 export type Lang = "zh" | "en";
 
-export const APP_NAME = "Davflare";
+export const APP_NAME = "YTO-SD";
 
 let currentLang: Lang = detectLang();
 const listeners = new Set<() => void>();
