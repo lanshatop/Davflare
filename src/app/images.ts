@@ -23,9 +23,11 @@ export async function listImages(): Promise<ImagesResponse> {
 }
 
 export async function uploadImage(file: File): Promise<HostedImage> {
+  // Header 值必须是 Latin-1 可编码字符串；中文文件名需 encodeURIComponent，
+  // 否则浏览器抛 "Failed to construct 'Headers': String contains non ISO-8859-1 code point"
   const response = await authFetch("/api/images", {
     method: "POST",
-    headers: { "X-File-Name": file.name },
+    headers: { "X-File-Name": encodeURIComponent(file.name) },
     body: file,
   });
   if (!response.ok) {
