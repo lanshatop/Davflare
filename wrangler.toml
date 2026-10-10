@@ -4,6 +4,7 @@ compatibility_date = "2024-06-20"
 
 [vars]
 WEBDAV_PUBLIC_READ = "0"
+WEBDAV_USERNAME = "admin"
 
 [[r2_buckets]]
 binding = "BUCKET"
