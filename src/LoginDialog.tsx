@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { strings, translate } from "./app/strings";
+import { APP_NAME, strings, translate } from "./app/strings";
 import {
   Alert,
   Box,
@@ -70,7 +70,7 @@ function LoginDialog() {
               component="div"
               sx={{ fontWeight: 700, letterSpacing: "-0.03em", color: "primary.main" }}
             >
-              Davflare
+              {APP_NAME}
             </Typography>
             <DialogContentText sx={{ maxWidth: 300 }}>
               {strings.loginHint}
