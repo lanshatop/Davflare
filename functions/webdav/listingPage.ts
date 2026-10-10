@@ -200,14 +200,14 @@ export function renderListingPage(options: {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(title)} · Davflare</title>
+<title>${escapeHtml(title)} · YTO-SD</title>
 <link rel="icon" href="/favicon.png">
 <style>${LISTING_CSS}</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${ICON_SYMBOLS}</defs></svg>
 <main>
-  <header class="brand">${BRAND_MARK}Davflare</header>
+  <header class="brand">${BRAND_MARK}YTO-SD</header>
   <section class="card">
     <nav class="crumbs" aria-label="Breadcrumb">${renderCrumbs(options.path, t.root)}</nav>
     ${
