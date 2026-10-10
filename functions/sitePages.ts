@@ -11,7 +11,7 @@ export const ALBUM_MAX_IMAGES = 200;
 export const ALBUM_MAX_BYTES = 100 * 1024 * 1024;
 /** 公开目录：每次最多 500 个文件、总共 2GB（只取文件夹当前层）。 */
 export const DIR_MAX_FILES = 500;
-export const DIR_MAX_BYTES = 2 * 1024 * 1024 * 1024;
+export const DIR_MAX_BYTES = 2 * 1024 * 1024;
 /** 文档站：Markdown + 被引用图片合计最多 200 个文件、100MB。 */
 export const DOCS_MAX_FILES = 200;
 export const DOCS_MAX_BYTES = 100 * 1024 * 1024;
@@ -380,12 +380,12 @@ function docShell(lang: PageLang, title: string, body: string, extraScript = "")
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(title)} · Davflare</title>
+<title>${escapeHtml(title)} · YTO-SD</title>
 <style>${PAGE_CSS}</style>
 </head>
 <body>
 <div class="wrap">
-  <header class="brand">Davflare</header>
+  <header class="brand">YTO-SD</header>
   ${body}
 </div>
 ${extraScript}
@@ -614,7 +614,7 @@ export function docsScopeOf(keys: string[]): string {
 
 export function isInDocsScope(key: string, scope: string): boolean {
   if (!key || key.includes("_$flaredrive$")) return false;
-  if (key.split("/").some((part) => !part || part === "." || part === "..")) return false;
+  if (!key || key.includes("_$flaredrive$")) return false;
   if (!scope) return !key.includes("/");
   return key.startsWith(`${scope}/`);
 }
