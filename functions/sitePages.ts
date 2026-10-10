@@ -9,9 +9,9 @@ export { ALBUM_MANIFEST_NAME, isSafeManifestRel };
 export const NAV_MAX_LINKS = 1000;
 export const ALBUM_MAX_IMAGES = 200;
 export const ALBUM_MAX_BYTES = 100 * 1024 * 1024;
-/** 公开目录：每次最多 500 个文件、总共 30MB（只取文件夹当前层）。 */
+/** 公开目录：每次最多 500 个文件、总共 600MB（只取文件夹当前层）。 */
 export const DIR_MAX_FILES = 500;
-export const DIR_MAX_BYTES = 30 * 1024 * 1024;
+export const DIR_MAX_BYTES = 600 * 1024 * 1024;
 /** 文档站：Markdown + 被引用图片合计最多 200 个文件、100MB。 */
 export const DOCS_MAX_FILES = 200;
 export const DOCS_MAX_BYTES = 100 * 1024 * 1024;
