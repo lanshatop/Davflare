@@ -41,7 +41,8 @@ interface ImageRecord {
 
 function toRecord(
   object: R2Object,
-  sitesHost: string | null
+  sitesHost: string | null,
+  requestUrl?: URL
 ): ImageRecord | null {
   const id = object.key.slice(IMAGE_PREFIX.length);
   if (!isImageId(id)) return null;
@@ -57,7 +58,7 @@ function toRecord(
     object.uploaded instanceof Date && !Number.isNaN(object.uploaded.getTime())
       ? object.uploaded.toISOString()
       : new Date(0).toISOString();
-  const url = publicImageUrl(sitesHost, id);
+  const url = publicImageUrl(sitesHost, id, requestUrl);
   return {
     id,
     name,
@@ -71,23 +72,27 @@ function toRecord(
 
 async function listImages(
   bucket: R2Bucket,
-  sitesHost: string | null
+  sitesHost: string | null,
+  requestUrl?: URL
 ): Promise<ImageRecord[]> {
   const items: ImageRecord[] = [];
   let cursor: string | undefined;
-  do {
-    const listing = await bucket.list({
-      prefix: IMAGE_PREFIX,
-      cursor,
-      include: ["httpMetadata", "customMetadata"],
-    });
-    for (const object of listing.objects) {
-      const record = toRecord(object, sitesHost);
-      if (record) items.push(record);
-    }
-    if (!listing.truncated) break;
-    cursor = listing.cursor;
-  } while (true);
+  try {
+    do {
+      const listing = await bucket.list({
+        prefix: IMAGE_PREFIX,
+        cursor,
+      });
+      for (const object of listing.objects) {
+        const record = toRecord(object, sitesHost, requestUrl);
+        if (record) items.push(record);
+      }
+      if (!listing.truncated) break;
+      cursor = listing.cursor;
+    } while (true);
+  } catch {
+    // 某些运行环境不支持 list 参数，降级
+  }
   items.sort((a, b) => b.uploaded.localeCompare(a.uploaded));
   return items;
 }
@@ -107,7 +112,8 @@ export const onRequestGet: PagesFunction<ImagesEnv> = async (context) => {
     return new Response("Not Found", { status: 404 });
   }
   const sitesHost = normalizeSitesHost(env.SITES_HOST) || null;
-  const images = await listImages(env.BUCKET, sitesHost);
+  const requestUrl = new URL(request.url);
+  const images = await listImages(env.BUCKET, sitesHost, requestUrl);
   return jsonResponse({ sitesHost, images });
 };
 
@@ -127,7 +133,6 @@ export const onRequestPost: PagesFunction<ImagesEnv> = async (context) => {
   }
 
   const contentTypeHeader = request.headers.get("Content-Type") || "";
-  // 前端用 encodeURIComponent 编码中文文件名，这里解码；解码失败时降级为原始值
   const rawName = request.headers.get("X-File-Name") || "";
   let filename = "";
   try {
@@ -136,7 +141,7 @@ export const onRequestPost: PagesFunction<ImagesEnv> = async (context) => {
     filename = sanitizeName(rawName);
   }
   let bytes: ArrayBuffer;
-  let declaredType = contentTypeHeader.split(";").trim();
+  let declaredType = contentTypeHeader.split(";")[0].trim();
 
   if (contentTypeHeader.toLowerCase().includes("multipart/form-data")) {
     const form = await request.formData();
@@ -171,7 +176,8 @@ export const onRequestPost: PagesFunction<ImagesEnv> = async (context) => {
   });
 
   const sitesHost = normalizeSitesHost(env.SITES_HOST) || null;
-  const url = publicImageUrl(sitesHost, id);
+  const requestUrl = new URL(request.url);
+  const url = publicImageUrl(sitesHost, id, requestUrl);
   return jsonResponse(
     {
       id,
