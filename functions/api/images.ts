@@ -41,8 +41,7 @@ interface ImageRecord {
 
 function toRecord(
   object: R2Object,
-  sitesHost: string | null,
-  requestUrl?: URL
+  sitesHost: string | null
 ): ImageRecord | null {
   const id = object.key.slice(IMAGE_PREFIX.length);
   if (!isImageId(id)) return null;
@@ -58,7 +57,7 @@ function toRecord(
     object.uploaded instanceof Date && !Number.isNaN(object.uploaded.getTime())
       ? object.uploaded.toISOString()
       : new Date(0).toISOString();
-  const url = publicImageUrl(sitesHost, id, requestUrl);
+  const url = publicImageUrl(sitesHost, id);
   return {
     id,
     name,
@@ -72,8 +71,7 @@ function toRecord(
 
 async function listImages(
   bucket: R2Bucket,
-  sitesHost: string | null,
-  requestUrl?: URL
+  sitesHost: string | null
 ): Promise<ImageRecord[]> {
   const items: ImageRecord[] = [];
   let cursor: string | undefined;
@@ -84,7 +82,7 @@ async function listImages(
         cursor,
       });
       for (const object of listing.objects) {
-        const record = toRecord(object, sitesHost, requestUrl);
+        const record = toRecord(object, sitesHost);
         if (record) items.push(record);
       }
       if (!listing.truncated) break;
@@ -112,8 +110,7 @@ export const onRequestGet: PagesFunction<ImagesEnv> = async (context) => {
     return new Response("Not Found", { status: 404 });
   }
   const sitesHost = normalizeSitesHost(env.SITES_HOST) || null;
-  const requestUrl = new URL(request.url);
-  const images = await listImages(env.BUCKET, sitesHost, requestUrl);
+  const images = await listImages(env.BUCKET, sitesHost);
   return jsonResponse({ sitesHost, images });
 };
 
@@ -176,8 +173,7 @@ export const onRequestPost: PagesFunction<ImagesEnv> = async (context) => {
   });
 
   const sitesHost = normalizeSitesHost(env.SITES_HOST) || null;
-  const requestUrl = new URL(request.url);
-  const url = publicImageUrl(sitesHost, id, requestUrl);
+  const url = publicImageUrl(sitesHost, id);
   return jsonResponse(
     {
       id,
