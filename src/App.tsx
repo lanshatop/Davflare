@@ -39,7 +39,6 @@ export interface SnackbarMessage {
   duration?: number;
 }
 
-/** error 排队；success/info 立刻顶到队首并丢掉已排队的非 error。 */
 export function enqueueSnack(
   queue: SnackbarMessage[],
   next: SnackbarMessage
@@ -78,7 +77,7 @@ function AppContent({
   themeMode: ThemeModePreference;
   onThemeModeChange: (mode: ThemeModePreference) => void;
 }) {
-  useLang(); // 语言切换时触发整树重渲染
+  useLang();
   const { username, logout } = useAuth();
   const { flags } = useFeatures();
   const transferQueue = useTransferQueue();
@@ -223,15 +222,15 @@ function AppContent({
       >
         <Main
           search={search}
-        onSearchChange={setSearch}
-        onNotify={onNotify}
-        view={view}
-        onViewChange={setView}
-        sort={sort}
-        onSortChange={setSort}
-        route={route}
-        navigate={navigate}
-        onOpenApi={() => flags.apiKey && setShowApiKeys(true)}
+          onSearchChange={setSearch}
+          onNotify={onNotify}
+          view={view}
+          onViewChange={setView}
+          sort={sort}
+          onSortChange={setSort}
+          route={route}
+          navigate={navigate}
+          onOpenApi={() => flags.apiKey && setShowApiKeys(true)}
           onContentScroll={setContentScrolled}
         />
       </Box>
