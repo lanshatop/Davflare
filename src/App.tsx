@@ -110,10 +110,6 @@ function AppContent({
     []
   );
 
-  // 队列化展示：上一条退出动画结束后再弹下一条，连续消息不再互相覆盖。
-  // onExited 是队列消费点；退场期间队首仍是已展示过的消息，用 shownSnackKeyRef
-  // 挡住重开——否则 effect 会在退出动画完成前把 Snackbar 重新打开，onExited
-  // 永不触发，消息每轮 autoHideDuration 重闪一次。
   useEffect(() => {
     if (snackOpen || snackQueue.length === 0) return;
     const head = snackQueue[0];
@@ -161,7 +157,6 @@ function AppContent({
         (event.key === "k" || event.key === "K") &&
         (event.metaKey || event.ctrlKey);
       if (cmdK) {
-        // 命令面板快捷键即使在输入框聚焦时也要生效，故先于 isTypingTarget 判断
         event.preventDefault();
         setShowPalette(true);
         return;
@@ -179,6 +174,14 @@ function AppContent({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  if (username === null) {
+    return (
+      <Stack sx={{ height: "100%", backgroundColor: "background.default" }}>
+        <LoginDialog />
+      </Stack>
+    );
+  }
 
   return (
     <Stack sx={{ height: "100%", minHeight: 0, overflow: "hidden", backgroundColor: "background.default" }}>
@@ -232,7 +235,6 @@ function AppContent({
           onContentScroll={setContentScrolled}
         />
       </Box>
-      {username === null && <LoginDialog />}
       <Snackbar
         key={currentSnack?.key}
         autoHideDuration={currentSnack?.duration ?? (currentSnack?.severity === "error" ? ERROR_SNACK_MS : DEFAULT_SNACK_MS)}
@@ -315,7 +317,6 @@ function ThemedApp() {
 }
 
 function App() {
-  // 退出登录清缩略图缓存要在启动时就挂上，不能等第一次加载缩略图（#184）
   useEffect(() => {
     installThumbnailCacheCleanup();
   }, []);
